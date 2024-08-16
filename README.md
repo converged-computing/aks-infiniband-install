@@ -30,16 +30,13 @@ Some additional notes - you need an AKS nodepool with RDMA-capable skus (see [he
 
 ## 3. Node Init
 
-Note that if you shell in now and install `ibverbs-utils` and do `ibv_devices` it will be empty. Let's try to install infiniband next, and we will use a container that is also built with ubuntu 22.04 drivers.
-
-
-I was originally looking at [https://github.com/Mellanox/ib-kubernetes](https://github.com/Mellanox/ib-kubernetes). You can just do but then I switched to [https://github.com/Azure/aks-rdma-infiniband](https://github.com/Azure/aks-rdma-infiniband). I wound up building a custom image (ubuntu 22.04 and packages) and customizing the configs so they wouldn't exit with error.
+Note that if you shell into a node (install `kubectl node-shell`) if you install `ibverbs-utils` and do `ibv_devices` it will be empty. Let's try to install infiniband next, and we will use a container that is also built with ubuntu 22.04 drivers. I was originally looking at [https://github.com/Mellanox/ib-kubernetes](https://github.com/Mellanox/ib-kubernetes). You can just do but then I switched to the approach we have here. Let's first install the drivers:
 
 ```bash
-kubectl apply -k infiniband/driver-installation.yaml
+kubectl apply -f ./driver-installation.yaml
 ```
 
-When they are done, here is how to check that it was successful.
+When they are done, here is how to check that it was successful - this isn't perfect but it works. Basically we want to see that the ib0 device is up.
 
 ```bash
 for pod in $(kubectl get pods -o json | jq -r .items[].metadata.name)
@@ -51,7 +48,7 @@ done
 That should equal the number of nodes. Then.
 
 ```bash
-kubectl delete -f infiniband/driver-installation.yml 
+kubectl delete -f ./driver-installation.yaml
 ```
 
 If you want to test Infiniband, you need to use ping.
@@ -69,21 +66,11 @@ ibv_rc_pingpong aks-userpool-14173555-vmss000000
 Apply the daemonset to make it available to pods:
 
 ```bash
-kubectl apply -k infiniband/daemonset/
+kubectl apply -k ./daemonset/
 ```
 
-Now install the Flux Operator:
-
-```bash
-kubectl apply -f ./flux-operator.yaml
-```
-
-Now we are ready for different MiniCluster setups. For each of the below, to shell in to the lead broker (index 0) you do:
-
-```bash
-kubectl exec -it flux-sample-0-xxx bash
-```
-
+Note that the [ucx perftest](https://github.com/openucx/ucx/tree/master?tab=readme-ov-file#ucx-performance-test) I have found useful.
+We will add examples with HPC applications (or a link to a repository with them) soon.
 
 ## License
 

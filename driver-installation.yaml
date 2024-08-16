@@ -101,9 +101,9 @@ data:
     # Read in ip links, rename to ib0, and start
     # ip link set ibP257s75549 name ib0    
     # ip link set ib0 up
-    python3 /opt/parse-links.py
+    wget https://raw.githubusercontent.com/converged-computing/aks-infiniband-install/main/parse-links.py
+    python3 parse-links.py
     ip link
-    set -x
     check_ib="$(ip link | grep ib0)"
     if [ -z "$check_ib" ];
     then
