@@ -69,6 +69,7 @@ Apply the daemonset to make it available to pods:
 kubectl apply -k ./daemonset/
 ```
 
+You can get a test environment in [test](test).
 Note that the [ucx perftest](https://github.com/openucx/ucx/tree/master?tab=readme-ov-file#ucx-performance-test) I have found useful.
 We will add examples with HPC applications (or a link to a repository with them) soon.
 
