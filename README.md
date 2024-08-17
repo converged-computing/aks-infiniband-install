@@ -2,14 +2,27 @@
 
 We are trying to get Infiniband working on AKS, and this small series of steps will help.
 We are using the build here to install the drivers to the nodes, and then the [Mellanox/k8s-rdma-shared-dev-plugin](https://github.com/Mellanox/k8s-rdma-shared-dev-plugin/tree/master/deployment/k8s) to provide a CNI to enable Infiniband on the pods.
+The directories are organized by OS and driver version, since it matters.
 
 ## 1. Build Image
 
-You'll need to have the driver that matches your node version. Nvidia has disabled allowing wget / curl of the file so you'll need to agree to their license agreement and download it [from this page](https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/). Note that we follow the instructions [here](https://docs.nvidia.com/networking/display/mlnxofedv461000/installing+mellanox+ofed) to install it with the daemonset. Then update in the Dockerfile:
+You can build either of the following drivers:
 
-1. The base image to use (e.g., ubuntu:22.04) to match your driver
+ - [ubuntu22.04](ubuntu22.04): will build for `MLNX_OFED_LINUX-24.04-0.7.0.0-ubuntu22.04-x86_64` (Connect-X 4 and 5)
+ - [ubuntu20.04](ubuntu20.04): will build for `mlnx-en-4.9-7.1.0.0-ubuntu20.04-x86_64.iso` (supports Connect 3 too)
+
+You'll need to have the driver that matches your node version. Nvidia has disabled allowing wget / curl of the newer files so you'll need to agree to their license agreement and download it [from this page](https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/) and put the iso in the respective folder you want to build from. Note that we follow the instructions [here](https://docs.nvidia.com/networking/display/mlnxofedv461000/installing+mellanox+ofed) to install it with the daemonset. Then update in the Dockerfile:
+
+1. The base image to use (e.g., ubuntu:22.04 or ubuntu:20.04) to match your driver
 2. The `COPY` directive to copy the ISO into the directory
-3. The [driver-installation.yaml](driver-installation.yaml) that references it
+3. The [driver-installation.yaml](driver-installation.yaml) or [driver-installation-with-gpu.yaml](driver-installation-with-gpu.yaml) that references it
+
+Building each image:
+
+```bash
+docker build -t ghcr.io/converged-computing/aks-infiniband-install:ubuntu-22.04 ubuntu22.04
+docker build -t ghcr.io/converged-computing/aks-infiniband-install:ubuntu-20.04 ubuntu20.04
+```
 
 ## 2. Cluster Setup
 
