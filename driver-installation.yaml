@@ -44,6 +44,7 @@ spec:
                 - Standard_ND96amsr_A100_v4
                 - Standard_ND96asr_v4
                 - Standard_HC44rs
+                - standard_hb120-96rs_v3
 
       hostNetwork: true
       hostPID: true

@@ -6,22 +6,21 @@ The directories are organized by OS and driver version, since it matters.
 
 ## 1. Build Image
 
-You can build either of the following drivers:
+In practice, we built only the latest (22.04) drivers and got that to work on older devices by way of customizing flags. The other directories (aside from ubuntu22.04) are provided
+for example, but we have not used them. 
 
  - [ubuntu22.04](ubuntu22.04): will build for `MLNX_OFED_LINUX-24.04-0.7.0.0-ubuntu22.04-x86_64` (Connect-X 4 and 5)
- - [ubuntu20.04](ubuntu20.04): will build for `mlnx-en-4.9-7.1.0.0-ubuntu20.04-x86_64.iso` (supports Connect 3 too)
 
 You'll need to have the driver that matches your node version. Nvidia has disabled allowing wget / curl of the newer files so you'll need to agree to their license agreement and download it [from this page](https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/) and put the iso in the respective folder you want to build from. Note that we follow the instructions [here](https://docs.nvidia.com/networking/display/mlnxofedv461000/installing+mellanox+ofed) to install it with the daemonset. Then update in the Dockerfile:
 
-1. The base image to use (e.g., ubuntu:22.04 or ubuntu:20.04) to match your driver
+1. The base image to use (e.g., ubuntu:22.04) 
 2. The `COPY` directive to copy the ISO into the directory
 3. The [driver-installation.yaml](driver-installation.yaml) or [driver-installation-with-gpu.yaml](driver-installation-with-gpu.yaml) that references it
 
-Building each image:
+Building the image:
 
 ```bash
 docker build -t ghcr.io/converged-computing/aks-infiniband-install:ubuntu-22.04 ubuntu22.04
-docker build -t ghcr.io/converged-computing/aks-infiniband-install:ubuntu-20.04 ubuntu20.04
 ```
 
 ## 2. Cluster Setup
@@ -46,7 +45,11 @@ Some additional notes - you need an AKS nodepool with RDMA-capable skus (see [he
 Note that if you shell into a node (install `kubectl node-shell`) if you install `ibverbs-utils` and do `ibv_devices` it will be empty. Let's try to install infiniband next, and we will use a container that is also built with ubuntu 22.04 drivers. I was originally looking at [https://github.com/Mellanox/ib-kubernetes](https://github.com/Mellanox/ib-kubernetes). You can just do but then I switched to the approach we have here. Let's first install the drivers:
 
 ```bash
+# Regular without gpu (ubuntu 22.04 full)
 kubectl apply -f ./driver-installation.yaml
+
+# GPU (without doing a host check)
+kubectl apply -f ./driver-installation-with-gpu.yaml
 ```
 
 When they are done, here is how to check that it was successful - this isn't perfect but it works. Basically we want to see that the ib0 device is up.

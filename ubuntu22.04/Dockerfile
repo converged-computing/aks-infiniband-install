@@ -8,7 +8,7 @@ FROM ubuntu:22.04 AS debs
 
 WORKDIR /opt/debs
 USER root
-COPY MLNX_OFED_LINUX-24.04-0.7.0.0-ubuntu22.04-x86_64.iso ./MLNX_OFED_LINUX-24.04-0.7.0.0-ubuntu22.04-x86_64.iso
+COPY MLNX_OFED_LINUX-24.04-0.7.0.0-ubuntu22.04-x86_64.iso ./MLNX_OFED_LINUX-24.04-0.7.0.0-ubuntu22.04-x86_64.iso 
 FROM ubuntu:22.04
 
 COPY --from=debs /opt/debs /opt/debs
