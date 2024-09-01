@@ -27,11 +27,12 @@ spec:
                 operator: In
                 values:
                 - Standard_ND40rs_v2
+                - standard_nd40rs_v2
 
       hostNetwork: true
       hostPID: true
       containers:
-      - image: ghcr.io/converged-computing/aks-infiniband-install:ubuntu-20.04
+      - image: ghcr.io/converged-computing/aks-infiniband-install:ubuntu-22.04
         imagePullPolicy: Always
         name: *name
         command: ["/entrypoint.sh"] 
@@ -74,18 +75,18 @@ data:
     #!/usr/bin/env bash
     set -eo pipefail
 
-    sleep infinity
     umount /mnt/install || true
+
     cd /opt/debs
     mkdir -p /mnt/install
-    mount -o ro,loop ./mlnx-en-4.9-7.1.0.0-ubuntu20.04-x86_64.iso /mnt/install
-    /mnt/install/mlnxofedinstall --force
+    mount -o ro,loop ./MLNX_OFED_LINUX-24.04-0.7.0.0-ubuntu22.04-x86_64.iso /mnt/install
+    /mnt/install/mlnxofedinstall --skip-unsupported-devices-check --force
     /etc/init.d/openibd restart
     
     # Read in ip links, rename to ib0, and start
     # ip link set ibP257s75549 name ib0    
     # ip link set ib0 up
-    wget https://raw.githubusercontent.com/converged-computing/aks-infiniband-install/main/ubuntu20.04/parse-links.py
+    wget https://raw.githubusercontent.com/converged-computing/aks-infiniband-install/main/ubuntu22.04/parse-links.py
     python3 parse-links.py
     ip link
     check_ib="$(ip link | grep ib0)"
