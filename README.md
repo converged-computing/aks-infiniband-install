@@ -38,11 +38,11 @@ az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/A
 az provider register --namespace Microsoft.ContainerService
 ```
 
-Some additional notes - you need an AKS nodepool with RDMA-capable skus (see [here])
+Some additional notes - you need an AKS nodepool with RDMA-capable skus.
 
 ## 3. Node Init
 
-Note that if you shell into a node (install `kubectl node-shell`) if you install `ibverbs-utils` and do `ibv_devices` it will be empty. Let's try to install infiniband next, and we will use a container that is also built with ubuntu 22.04 drivers. I was originally looking at [https://github.com/Mellanox/ib-kubernetes](https://github.com/Mellanox/ib-kubernetes). You can just do but then I switched to the approach we have here. Let's first install the drivers:
+Note that if you shell into a node (install `kubectl node-shell`) if you install `ibverbs-utils` and do `ibv_devices` it will be empty. Let's try to install infiniband next, and we will use a container that is also built with ubuntu 22.04 drivers. I was originally looking at [https://github.com/Mellanox/ib-kubernetes](https://github.com/Mellanox/ib-kubernetes) but opted for this approach instead. You can just do but then I switched to the approach we have here. Let's first install the drivers:
 
 ```bash
 # Regular without gpu (ubuntu 22.04 full)
@@ -61,13 +61,14 @@ do
 done
 ```
 
-That should equal the number of nodes. Then.
+That should equal the number of nodes. 
+Apply the daemonset to make it available to pods:
 
 ```bash
-kubectl delete -f ./driver-installation.yaml
+kubectl apply -k ./daemonset/
 ```
 
-If you want to test Infiniband, you need to use ping.
+Here is a quick test:
 
 ```bash
 # First node
@@ -79,15 +80,9 @@ kubectl node-shell aks-userpool-14173555-vmss000001
 ibv_rc_pingpong aks-userpool-14173555-vmss000000
 ```
 
-Apply the daemonset to make it available to pods:
-
-```bash
-kubectl apply -k ./daemonset/
-```
-
 You can get a test environment in [test](test).
 Note that the [ucx perftest](https://github.com/openucx/ucx/tree/master?tab=readme-ov-file#ucx-performance-test) I have found useful.
-We will add examples with HPC applications (or a link to a repository with them) soon.
+We will add examples with HPC applications (or a link to a repository with them) if requested.
 
 ## License
 
