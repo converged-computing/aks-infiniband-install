@@ -2,7 +2,7 @@
 
 We are trying to get Infiniband working on AKS, and this small series of steps will help.
 We are using the build here to install the drivers to the nodes, and then the [Mellanox/k8s-rdma-shared-dev-plugin](https://github.com/Mellanox/k8s-rdma-shared-dev-plugin/tree/master/deployment/k8s) to provide a CNI to enable Infiniband on the pods.
-The directories are organized by OS and driver version, since it matters.
+The directories are organized by OS and driver version, since it matters. If you need to install to Usernetes on a node already running the driver, jump down to [install usernetes](#install-usernetes).
 
 ## 1. Build Image
 
@@ -83,6 +83,17 @@ ibv_rc_pingpong aks-userpool-14173555-vmss000000
 You can get a test environment in [test](test).
 Note that the [ucx perftest](https://github.com/openucx/ucx/tree/master?tab=readme-ov-file#ucx-performance-test) I have found useful.
 We will add examples with HPC applications (or a link to a repository with them) if requested.
+
+## Install Usernetes
+
+For Usernetes you should be running on host machines that already have drivers. Given the setup, you should see `/dev/infiniband` already in the container. We don't need to install drivers, but we do (should) install the driver installer for Kubernetes to do this properly.
+
+```bash
+kubectl apply -k ./daemonset-usernetes/
+
+# Check
+kubectl logs -n kube-system rdma-shared-dp-ds-hghzj
+```
 
 ## License
 
