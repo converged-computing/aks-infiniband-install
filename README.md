@@ -1,5 +1,7 @@
 # AKS Infiniband Installer
 
+[![DOI](https://zenodo.org/badge/842690306.svg)](https://doi.org/10.5281/zenodo.15253170)
+
 We are trying to get Infiniband working on AKS, and this small series of steps will help.
 We are using the build here to install the drivers to the nodes, and then the [Mellanox/k8s-rdma-shared-dev-plugin](https://github.com/Mellanox/k8s-rdma-shared-dev-plugin/tree/master/deployment/k8s) to provide a CNI to enable Infiniband on the pods.
 The directories are organized by OS and driver version, since it matters. If you need to install to Usernetes on a node already running the driver, jump down to [install usernetes](#install-usernetes).
